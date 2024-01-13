@@ -86,7 +86,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
 
             // Create cached gui contents
             this.selectButtonContent = new GUIContent(EditorGUIUtility.IconContent("scenepicking_pickable_hover"));
-            this.selectButtonContent.tooltip = "Go to Object";
+            this.selectButtonContent.tooltip = "Select Object";
             this.openInspectorButtonContent = new GUIContent(EditorGUIUtility.IconContent("Search Icon"));
             this.openInspectorButtonContent.tooltip = "Open Inspector";
             this.buttonMaxWidth = Mathf.Max(this.selectButtonContent.image.width, this.openInspectorButtonContent.image.width);
@@ -122,14 +122,26 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                 EditorGUILayout.BeginVertical();
                 foreach (ObjectHistoryEntry entry in this.objectEntries.GetElements()) {
                     EditorGUILayout.BeginHorizontal();
+
+                    // Draw object label
                     EditorGUI.BeginDisabledGroup(true);
+                    // A workaround to make disabled groups not faded - Set alpha multiplier to 2 (disabled groups are 0.5 alpha)
+                    Color guiColor = GUI.color;
+                    guiColor.a = 2;
+                    GUI.color = guiColor;
+
                     EditorGUILayout.ObjectField(entry.objectEntry, typeof(Object), allowSceneObjects: true);
+
+                    // Revert gui color
+                    GUI.color = guiColor;
                     EditorGUI.EndDisabledGroup();
 
+                    // Draw buttons
                     bool canOpen = entry.objectEntry != null;
                     EditorGUI.BeginDisabledGroup(!canOpen);
                     if (GUILayout.Button(selectButtonContent, GUILayout.MaxWidth(buttonMaxWidth), GUILayout.MaxHeight(maxHeight))) {
                         if (entry.objectEntry != null) {
+                            Selection.activeObject = entry.objectEntry;
                             EditorGUIUtility.PingObject(entry.objectEntry);
                         }
                     }
@@ -140,6 +152,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                     }
 
                     EditorGUI.EndDisabledGroup();
+
                     EditorGUILayout.EndHorizontal();
                 }
 
