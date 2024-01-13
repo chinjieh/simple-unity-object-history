@@ -2,6 +2,8 @@
 
 This is a simple and lightweight Object History Window for Unity. The window records previously selected objects, which can be used for quick access.
 
+<img src="screenshots/simple-unity-object-history.gif" width="600" />
+
 ## Features
 
 - Very lightweight (one file!)
