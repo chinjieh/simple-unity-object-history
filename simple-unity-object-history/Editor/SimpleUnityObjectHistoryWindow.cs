@@ -117,9 +117,16 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                 return;
             }
 
-            SerializableHistory history = JsonUtility.FromJson<SerializableHistory>(historyString);
+            SerializableHistory history = null;
+            try {
+                history = JsonUtility.FromJson<SerializableHistory>(historyString);
+            }
+            catch (System.ArgumentException e) {
+                Debug.LogError("Error encountered loading history: " + e.ToString());
+            }
+
             this.objectEntries.Clear();
-            if (history.assetPaths != null) {
+            if (history != null && history.assetPaths != null) {
                 foreach (string assetPath in history.assetPaths) {
                     if (string.IsNullOrEmpty(assetPath))
                         continue;
@@ -147,8 +154,13 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
 
             SerializableHistory serializableHistory = new SerializableHistory();
             serializableHistory.assetPaths = assetPaths;
-            string serializedHistory = JsonUtility.ToJson(serializableHistory);
-            EditorPrefs.SetString(HISTORY_KEY, serializedHistory);
+            try {
+                string serializedHistory = JsonUtility.ToJson(serializableHistory);
+                EditorPrefs.SetString(HISTORY_KEY, serializedHistory);
+            }
+            catch (System.ArgumentException e) {
+                Debug.LogError("Error encountered saving history: " + e.ToString());
+            }
         }
 
         private void OnGUI() {
