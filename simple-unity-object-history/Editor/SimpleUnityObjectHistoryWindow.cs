@@ -31,7 +31,6 @@ using UnityEditor;
 namespace ChinJieh.SimpleUnityObjectHistory.Editor {
     public class SimpleUnityObjectHistoryWindow : EditorWindow {
         const int MAX_ITEMS = 20;
-        const string HISTORY_KEY = "ChinJieh.SimpleUnityObjectHistory.History";
 
         Vector2 scrollPosition;
         QueueWithLast<ObjectHistoryEntry> objectEntries = new QueueWithLast<ObjectHistoryEntry>();
@@ -39,11 +38,6 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
         GUIContent selectButtonContent;
         GUIContent openInspectorButtonContent;
         float buttonMaxWidth;
-
-        [System.Serializable]
-        class SerializableHistory {
-            public List<string> assetPaths;
-        }
 
         struct ObjectHistoryEntry {
             public Object objectEntry;
@@ -112,31 +106,17 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
         }
 
         void LoadHistory() {
-            string historyString = EditorPrefs.GetString(HISTORY_KEY, "");
-            if (string.IsNullOrEmpty(historyString)) {
-                return;
-            }
-
-            SerializableHistory history = null;
-            try {
-                history = JsonUtility.FromJson<SerializableHistory>(historyString);
-            }
-            catch (System.ArgumentException e) {
-                Debug.LogError("Error encountered loading history: " + e.ToString());
-            }
-
+            List<string> assetPaths = ObjectHistorySave.instance.GetAssetPaths();
             this.objectEntries.Clear();
-            if (history != null && history.assetPaths != null) {
-                foreach (string assetPath in history.assetPaths) {
-                    if (string.IsNullOrEmpty(assetPath))
-                        continue;
+            foreach (string assetPath in assetPaths) {
+                if (string.IsNullOrEmpty(assetPath))
+                    continue;
 
-                    Object asset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(Object));
-                    if (asset != null) {
-                        this.objectEntries.Enqueue(new ObjectHistoryEntry() {
-                            objectEntry = asset
-                        });
-                    }
+                Object asset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(Object));
+                if (asset != null) {
+                    this.objectEntries.Enqueue(new ObjectHistoryEntry() {
+                        objectEntry = asset
+                    });
                 }
             }
         }
@@ -152,15 +132,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                 }
             }
 
-            SerializableHistory serializableHistory = new SerializableHistory();
-            serializableHistory.assetPaths = assetPaths;
-            try {
-                string serializedHistory = JsonUtility.ToJson(serializableHistory);
-                EditorPrefs.SetString(HISTORY_KEY, serializedHistory);
-            }
-            catch (System.ArgumentException e) {
-                Debug.LogError("Error encountered saving history: " + e.ToString());
-            }
+            ObjectHistorySave.instance.SetAssetPaths(assetPaths);
         }
 
         private void OnGUI() {
@@ -246,5 +218,18 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                 Repaint();
             }
         }
+    }
+
+    /// <summary>
+    /// Use this to temporarily store object histories while the window is reloading / closed
+    /// </summary>
+    public class ObjectHistorySave : ScriptableSingleton<ObjectHistorySave> {
+        [SerializeField] List<string> assetPaths = new List<string>();
+
+        public void SetAssetPaths(List<string> assetPaths) {
+            this.assetPaths = assetPaths;
+        }
+
+        public List<string> GetAssetPaths() { return this.assetPaths; }
     }
 }

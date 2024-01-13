@@ -36,7 +36,8 @@ In Unity, open the window at: **Window > General > Simple Object History**. This
 ## Known Issues / Future Work:
 
 1. Scene objects and objects in Prefabs are currently recorded, but will be removed from the History once the Scene or Prefab has been closed.
-2. Currently, the maximum size of the History is 20, which is adjustable in the code. Future work will be to move this into a configurable plugin preference.
+2. The History is not saved to disk, and will only persist throughout active Editor sessions
+3. Currently, the maximum size of the History is 20, which is adjustable in the code. Future work will be to move this into a configurable plugin preference.
 
 [unity-git]: https://docs.unity3d.com/Manual/upm-ui-giturl.html
 [unity-local-package]: https://docs.unity3d.com/Manual/upm-ui-local.html
