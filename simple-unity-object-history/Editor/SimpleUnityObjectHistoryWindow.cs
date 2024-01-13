@@ -179,10 +179,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                     Color guiColor = GUI.color;
                     guiColor.a = 2;
                     GUI.color = guiColor;
-
                     EditorGUILayout.ObjectField(entry.objectEntry, typeof(Object), allowSceneObjects: true);
-
-                    // Revert gui color
                     GUI.color = guiColor;
                     EditorGUI.EndDisabledGroup();
 
@@ -218,7 +215,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
         void HandleSelectionChanged() {
             Object selection = Selection.activeObject;
             if (selection != null) {
-                // Ignore identical object if it is the end of the history
+                // Ignore identical object if it is already at the end of the history
                 if (objectEntries.Count > 0 && objectEntries.GetLastQueued().objectEntry == selection)
                     return;
 
@@ -231,7 +228,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                     this.objectEntries.Dequeue();
                 }
 
-                // Move down to the last scroll position when changed
+                // Move down to the bottom of the scroll position when changed
                 this.scrollPosition = new(this.scrollPosition.x, this.position.height);
 
                 Repaint();
