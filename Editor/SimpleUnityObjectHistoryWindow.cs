@@ -31,6 +31,7 @@ using UnityEditor;
 namespace ChinJieh.SimpleUnityObjectHistory.Editor {
     public class SimpleUnityObjectHistoryWindow : EditorWindow {
         const int MAX_ITEMS = 20;
+        const string HISTORY_KEY = "ChinJieh.SimpleUnityObjectHistory.History";
 
         Vector2 scrollPosition;
         QueueWithLast<ObjectHistoryEntry> objectEntries = new QueueWithLast<ObjectHistoryEntry>();
@@ -38,6 +39,11 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
         GUIContent selectButtonContent;
         GUIContent openInspectorButtonContent;
         float buttonMaxWidth;
+
+        [System.Serializable]
+        class SerializableHistory {
+            public List<string> assetPaths;
+        }
 
         struct ObjectHistoryEntry {
             public Object objectEntry;
@@ -90,15 +96,59 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
             this.openInspectorButtonContent = new GUIContent(EditorGUIUtility.IconContent("Search Icon"));
             this.openInspectorButtonContent.tooltip = "Open Inspector";
             this.buttonMaxWidth = Mathf.Max(this.selectButtonContent.image.width, this.openInspectorButtonContent.image.width);
+
+            LoadHistory();
         }
 
         private void OnDisable() {
+            SaveHistory();
+
             Selection.selectionChanged -= HandleSelectionChanged;
 
             this.selectButtonContent = null;
             this.openInspectorButtonContent = null;
             this.objectEntries.Clear();
             this.buttonMaxWidth = 0;
+        }
+
+        void LoadHistory() {
+            string historyString = EditorPrefs.GetString(HISTORY_KEY, "");
+            if (string.IsNullOrEmpty(historyString)) {
+                return;
+            }
+
+            SerializableHistory history = JsonUtility.FromJson<SerializableHistory>(historyString);
+            this.objectEntries.Clear();
+            if (history.assetPaths != null) {
+                foreach (string assetPath in history.assetPaths) {
+                    if (string.IsNullOrEmpty(assetPath))
+                        continue;
+
+                    Object asset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(Object));
+                    if (asset != null) {
+                        this.objectEntries.Enqueue(new ObjectHistoryEntry() {
+                            objectEntry = asset
+                        });
+                    }
+                }
+            }
+        }
+
+        void SaveHistory() {
+            List<string> assetPaths = new List<string>(this.objectEntries.Count);
+            foreach (ObjectHistoryEntry entry in this.objectEntries.GetElements()) {
+                if (entry.objectEntry != null) {
+                    string assetPath = AssetDatabase.GetAssetPath(entry.objectEntry);
+                    if (!string.IsNullOrEmpty(assetPath)) {
+                        assetPaths.Add(assetPath);
+                    }
+                }
+            }
+
+            SerializableHistory serializableHistory = new SerializableHistory();
+            serializableHistory.assetPaths = assetPaths;
+            string serializedHistory = JsonUtility.ToJson(serializableHistory);
+            EditorPrefs.SetString(HISTORY_KEY, serializedHistory);
         }
 
         private void OnGUI() {
@@ -145,6 +195,7 @@ namespace ChinJieh.SimpleUnityObjectHistory.Editor {
                             EditorGUIUtility.PingObject(entry.objectEntry);
                         }
                     }
+
                     if (GUILayout.Button(openInspectorButtonContent, GUILayout.MaxWidth(buttonMaxWidth), GUILayout.MaxHeight(maxHeight))) {
                         if (entry.objectEntry != null) {
                             EditorUtility.OpenPropertyEditor(entry.objectEntry);
