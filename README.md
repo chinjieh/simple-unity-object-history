@@ -2,7 +2,7 @@
 
 This is a simple and lightweight Object History Window for Unity. The window records previously selected objects, which can be used for quick access.
 
-# Features
+## Features
 
 - Very lightweight (one file!)
 - Records selection history and allows for navigation to previously selected objects
