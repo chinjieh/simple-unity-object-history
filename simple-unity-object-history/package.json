@@ -7,6 +7,7 @@
     },
     "description": "A simple object history window for Unity. Records previous selections and enables quick access to them.",
     "displayName": "Simple Unity Object History",
+    "documentationUrl": "https://github.com/chinjieh/simple-unity-object-history",
     "keywords": [
         "simple",
         "object",
