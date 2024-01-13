@@ -10,11 +10,10 @@ This is a simple and lightweight Object History Window for Unity. The window rec
 
 ## Installation
 
-### Option A: Install as Unity Package (download release)
-1. Download a release build.
-2. Install the .zip file as a [Unity Local Package][unity-local-package].
+### Option A: Install as Unity Package (Git URL)
+1. Install the package with the [git URL][unity-git]: `https://github.com/chinjieh/simple-unity-object-history.git?path=/simple-unity-object-history`
 
-### Option B: Install as Unity Package (source)
+### Option B: Install as Unity Package (Local Package)
 1. Download or clone the repository.
 2. Install the `simple-unity-object-history` folder as a [Unity Local Package][unity-local-package].
 
@@ -37,4 +36,5 @@ In Unity, open the window at: **Window > General > Simple Object History**. This
 1. Scene objects and objects in Prefabs are currently recorded, but will be removed from the History once the Scene or Prefab has been closed.
 2. Currently, the maximum size of the History is 20, which is adjustable in the code. Future work will be to move this into a configurable plugin preference.
 
+[unity-git]: https://docs.unity3d.com/Manual/upm-ui-giturl.html
 [unity-local-package]: https://docs.unity3d.com/Manual/upm-ui-local.html
