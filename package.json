@@ -1,0 +1,14 @@
+{
+    "name": "com.chinjieh.simple-unity-object-history",
+    "version": "1.0.0",
+    "author": {
+        "name": "Chin Jieh"
+    },
+    "description": "A simple object history window for Unity. Records previous selections and enables quick access to them.",
+    "displayName": "Simple Unity Object History",
+    "keywords": [
+        "simple",
+        "object",
+        "history"
+    ]
+}
